@@ -54,10 +54,17 @@ set<ChoiceID> Choices::allChoices() const
 	return all;
 }
 
-void Choices::AddChoice(string choice)
+ChoiceID Choices::AddChoice(string choice)
 {
-	if (intern->data.count(choice) == 0)
-		intern->data[choice] = intern->nextID++;
+	map<string, ChoiceID>::iterator entry = intern->data.find(choice);
+	if (entry == intern->data.end())
+	{
+		ChoiceID id = intern->nextID++;
+		intern->data[choice] = id;
+		return id;
+	}
+
+	return entry->second;
 }
 
 void Choices::RemoveChoice(ChoiceID id)

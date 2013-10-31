@@ -18,7 +18,7 @@ public:
 
 	std::set<ChoiceID> allChoices() const;
 
-	void AddChoice(std::string choice);
+	ChoiceID AddChoice(std::string choice);
 	void RemoveChoice(ChoiceID id);
 
 	ChoiceID LookupID(std::string choice) const;
