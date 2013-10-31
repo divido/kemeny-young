@@ -28,17 +28,13 @@ typedef deque<ChoiceID> Permutation;
 
 struct PermutingAlgorithm::Internals
 {
-	const Choices *choices;
-
-	void Print(const Permutation &permutation, unsigned score);
+	void Print(const Choices &choices, const Permutation &permutation, unsigned score);
 	deque<set<ChoiceID> > Merge(const deque<Permutation> &results);
 };
 
-PermutingAlgorithm::PermutingAlgorithm(const Choices &choices, const std::deque<Voter> &voters)
-	: Algorithm(choices, voters)
+PermutingAlgorithm::PermutingAlgorithm()
 {
 	intern = new Internals;
-	intern->choices = &choices;
 }
 
 PermutingAlgorithm::~PermutingAlgorithm()
@@ -46,11 +42,13 @@ PermutingAlgorithm::~PermutingAlgorithm()
 	delete intern;
 }
 
-deque<set<ChoiceID> > PermutingAlgorithm::Execute(const set<ChoiceID> &choices, const deque<Voter> &voters)
+deque<set<ChoiceID> > PermutingAlgorithm::Run(const Choices &choices, const deque<Voter> &voters)
 {
 	Permutation permutation;
+
+	set<ChoiceID> allChoices = choices.allChoices();
 	set<ChoiceID>::const_iterator choice;
-	for (choice = choices.begin(); choice != choices.end(); choice++)
+	for (choice = allChoices.begin(); choice != allChoices.end(); choice++)
 		permutation.push_back(*choice);
 
 	deque<Permutation> results;
@@ -115,7 +113,7 @@ deque<set<ChoiceID> > PermutingAlgorithm::Execute(const set<ChoiceID> &choices, 
 	return intern->Merge(results);
 }
 
-void PermutingAlgorithm::Internals::Print(const Permutation &permutation, unsigned score)
+void PermutingAlgorithm::Internals::Print(const Choices &choices, const Permutation &permutation, unsigned score)
 {
 	stringstream stream;
 	stream << setw(3) << score << " ";
@@ -124,7 +122,7 @@ void PermutingAlgorithm::Internals::Print(const Permutation &permutation, unsign
 	Permutation::const_iterator value;
 	for (value = permutation.begin(); value != permutation.end(); value++)
 	{
-		stream << (first ? "'" : ", '") << this->choices->LookupName(*value) << "'";
+		stream << (first ? "'" : ", '") << choices.LookupName(*value) << "'";
 		first = false;
 	}
 

@@ -1,3 +1,4 @@
+#if 0
 #include "Algorithm.h"
 
 #include <deque>
@@ -66,3 +67,4 @@ string Algorithm::AsString(string indent) const
 
 	return stream.str();
 }
+#endif

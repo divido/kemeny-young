@@ -17,16 +17,14 @@ using std::endl;
 
 struct CondorcetFilter::Internals
 {
-	const Choices *choices;
-	Algorithm *backup;
+	Internals(Algorithm &setBackup) : backup(setBackup) {}
+
+	Algorithm &backup;
 };
 
-CondorcetFilter::CondorcetFilter(const Choices &choices, const deque<Voter> &voters, Algorithm &backup)
-	: Algorithm(choices, voters)
+CondorcetFilter::CondorcetFilter(Algorithm &backup)
 {
-	intern = new Internals;
-	intern->choices = &choices;
-	intern->backup = &backup;
+	intern = new Internals(backup);
 }
 
 CondorcetFilter::~CondorcetFilter()
@@ -34,12 +32,13 @@ CondorcetFilter::~CondorcetFilter()
 	delete intern;
 }
 
-deque<set<ChoiceID> > CondorcetFilter::Execute(const set<ChoiceID> &choices, const deque<Voter> &voters)
+deque<set<ChoiceID> > CondorcetFilter::Run(const Choices &choices, const deque<Voter> &voters)
 {
 	deque<ChoiceID> winners;
 	deque<ChoiceID> losers;
 
-	set<ChoiceID> contenders = choices;
+	set<ChoiceID> contenders = choices.allChoices();
+	Choices remainingChoices = choices;
 
 	// Look for Condorcet winners / losers
 	bool foundWinner, foundLoser;
@@ -63,16 +62,18 @@ deque<set<ChoiceID> > CondorcetFilter::Execute(const set<ChoiceID> &choices, con
 
 			if (foundWinner)
 			{
-				cout << intern->choices->LookupName(*candidate) << " is a condorcet winner" << endl;
+				cout << choices.LookupName(*candidate) << " is a condorcet winner" << endl;
 				winners.push_back(*candidate);
 				contenders.erase(candidate);
+				remainingChoices.RemoveChoice(*candidate);
 				break;
 			}
 			else if (foundLoser)
 			{
-				cout << intern->choices->LookupName(*candidate) << " is a condorcet loser" << endl;
+				cout << choices.LookupName(*candidate) << " is a condorcet loser" << endl;
 				losers.push_back(*candidate);
 				contenders.erase(candidate);
+				remainingChoices.RemoveChoice(*candidate);
 				break;
 			}
 		}
@@ -92,8 +93,7 @@ deque<set<ChoiceID> > CondorcetFilter::Execute(const set<ChoiceID> &choices, con
 	}
 
 	// Run the backup algorithm for the middle set
-	intern->backup->RunConstrained(contenders);
-	const deque<set<ChoiceID> > &backupResults = intern->backup->results();
+	deque<set<ChoiceID> > backupResults = intern->backup.Run(remainingChoices, voters);
 	deque<set<ChoiceID> >::const_iterator backupResult;
 	for (backupResult = backupResults.begin(); backupResult != backupResults.end(); backupResult++)
 		results.push_back(*backupResult);

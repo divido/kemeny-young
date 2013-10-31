@@ -11,28 +11,10 @@
 class Algorithm
 {
 public:
-	Algorithm(const Choices &choices, const std::deque<Voter> &voters);
-	virtual ~Algorithm();
+	Algorithm() {}
+	virtual ~Algorithm() {}
 
-	const std::deque<std::set<ChoiceID> > &results() const;
-
-	void Run();
-	void RunConstrained(const std::set<ChoiceID> &choices);
-	std::string AsString(std::string indent = "  ") const;
-
-protected:
-	virtual std::deque<std::set<ChoiceID> > Execute(const std::set<ChoiceID> &choices, const std::deque<Voter> &voters) = 0;
-
-private:
-	struct Internals;
-	Internals *intern;
+	virtual std::deque<std::set<ChoiceID> > Run(const Choices &choices, const std::deque<Voter> &voters) = 0;
 };
-
-// --------------------------------------------------------------------------------
-
-inline std::ostream &operator << (std::ostream &stream, const Algorithm &algorithm)
-{
-	return stream << algorithm.AsString();
-}
 
 #endif

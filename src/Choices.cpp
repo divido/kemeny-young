@@ -18,11 +18,13 @@ using std::runtime_error;
 struct Choices::Internals
 {
 	map<string, ChoiceID> data;
+	ChoiceID nextID;
 };
 
 Choices::Choices()
 {
 	intern = new Internals;
+	intern->nextID = 0;
 }
 
 Choices::Choices(const Choices &copy)
@@ -55,10 +57,23 @@ set<ChoiceID> Choices::allChoices() const
 void Choices::AddChoice(string choice)
 {
 	if (intern->data.count(choice) == 0)
+		intern->data[choice] = intern->nextID++;
+}
+
+void Choices::RemoveChoice(ChoiceID id)
+{
+	map<string, ChoiceID>::iterator entry;
+
+	for (entry = intern->data.begin(); entry != intern->data.end(); entry++)
 	{
-		ChoiceID id = static_cast<ChoiceID>(intern->data.size());
-		intern->data[choice] = id;
+		if (entry->second == id)
+		{
+			intern->data.erase(entry);
+			return;
+		}
 	}
+
+	throw runtime_error("RemoveChoice called for bad id");
 }
 
 ChoiceID Choices::LookupID(string choice) const

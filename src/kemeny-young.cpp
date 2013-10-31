@@ -11,6 +11,9 @@ using std::fstream;
 #include <deque>
 using std::deque;
 
+#include <set>
+using std::set;
+
 #include <iostream>
 using std::cout;
 using std::cerr;
@@ -30,6 +33,8 @@ int main(int argc, char **argv)
 		return 0;
 	}
 
+	// ----------------------------------------
+
 	Choices choices;
 	deque<Voter> voters;
 
@@ -42,12 +47,32 @@ int main(int argc, char **argv)
 	for (voter = voters.begin(); voter != voters.end(); voter++)
 		cout << *voter << endl;
 
-	PermutingAlgorithm permuting(choices, voters);
-	CondorcetFilter condorcet(choices, voters, permuting);
+	// ----------------------------------------
+
+	PermutingAlgorithm permuting;
+	CondorcetFilter condorcet(permuting);
 
 	Algorithm &algorithm = condorcet;
-	algorithm.Run();
-	cout << "Results:" << endl << algorithm << endl;
+	deque<set<ChoiceID> > winner = algorithm.Run(choices, voters);
+
+	// ----------------------------------------
+
+	cout << "Results:" << endl;
+
+	deque<set<ChoiceID> >::const_iterator iter;
+	for (iter = winner.begin(); iter != winner.end(); iter++)
+	{
+		bool first = true;
+		set<ChoiceID>::const_iterator selection;
+		for (selection = iter->begin(); selection != iter->end(); selection++)
+		{
+			cout << (first ? "'" : ", '") << choices.LookupName(*selection) << "'";
+			first = false;
+		}
+		cout << endl;
+	}
+
+	cout << endl;
 
 	return 0;
 }

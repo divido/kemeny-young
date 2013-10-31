@@ -6,11 +6,10 @@
 class CondorcetFilter : public Algorithm
 {
 public:
-	CondorcetFilter(const Choices &choices, const std::deque<Voter> &voters, Algorithm &backup);
+	CondorcetFilter(Algorithm &backup);
 	virtual ~CondorcetFilter();
 
-protected:
-	virtual std::deque<std::set<ChoiceID> > Execute(const std::set<ChoiceID> &choices, const std::deque<Voter> &voters);
+	virtual std::deque<std::set<ChoiceID> > Run(const Choices &choices, const std::deque<Voter> &voters);
 
 private:
 	struct Internals;

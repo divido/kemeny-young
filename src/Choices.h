@@ -17,7 +17,9 @@ public:
 	virtual ~Choices();
 
 	std::set<ChoiceID> allChoices() const;
+
 	void AddChoice(std::string choice);
+	void RemoveChoice(ChoiceID id);
 
 	ChoiceID LookupID(std::string choice) const;
 	std::string LookupName(ChoiceID id) const;
