@@ -141,6 +141,7 @@ deque<set<ChoiceID> > PermutingAlgorithm::Internals::Merge(const deque<Permutati
 	{
 		set<ChoiceID> tiedResults;
 
+		deque<Permutation>::const_iterator result;
 		for (result = results.begin(); result != results.end(); result++)
 		{
 			const Permutation &permutation = *result;

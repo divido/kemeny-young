@@ -14,7 +14,10 @@ public:
 	Algorithm(const Choices &choices, const std::deque<Voter> &voters);
 	virtual ~Algorithm();
 
+	const std::deque<std::set<ChoiceID> > &results() const;
+
 	void Run();
+	void RunConstrained(const std::set<ChoiceID> &choices);
 	std::string AsString(std::string indent = "  ") const;
 
 protected:

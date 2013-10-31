@@ -1,7 +1,9 @@
 #include "Parsing.h"
 #include "Choices.h"
 #include "Voter.h"
+
 #include "PermutingAlgorithm.h"
+#include "CondorcetFilter.h"
 
 #include <fstream>
 using std::fstream;
@@ -40,7 +42,10 @@ int main(int argc, char **argv)
 	for (voter = voters.begin(); voter != voters.end(); voter++)
 		cout << *voter << endl;
 
-	PermutingAlgorithm algorithm(choices, voters);
+	PermutingAlgorithm permuting(choices, voters);
+	CondorcetFilter condorcet(choices, voters, permuting);
+
+	Algorithm &algorithm = condorcet;
 	algorithm.Run();
 	cout << "Results:" << endl << algorithm << endl;
 

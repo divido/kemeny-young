@@ -20,7 +20,7 @@ struct Algorithm::Internals
 	deque<set<ChoiceID> > winner;
 };
 
-Algorithm::Algorithm(const Choices &choices, const std::deque<Voter> &voters)
+Algorithm::Algorithm(const Choices &choices, const deque<Voter> &voters)
 {
 	intern = new Internals;
 	intern->choices = &choices;
@@ -32,9 +32,19 @@ Algorithm::~Algorithm()
 	delete intern;
 }
 
+const deque<set<ChoiceID> > &Algorithm::results() const
+{
+	return intern->winner;
+}
+
 void Algorithm::Run()
 {
 	intern->winner = this->Execute(intern->choices->allChoices(), *intern->voters);
+}
+
+void Algorithm::RunConstrained(const set<ChoiceID> &choices)
+{
+	intern->winner = this->Execute(choices, *intern->voters);
 }
 
 string Algorithm::AsString(string indent) const
