@@ -77,7 +77,7 @@ deque<set<ChoiceID> > CondorcetFilter::Run(const Choices &choices, const deque<V
 				break;
 			}
 		}
-	} while (foundWinner || foundLoser);
+	} while ((foundWinner || foundLoser) && contenders.size() > 0);
 
 	// ----------------------------------------
 
