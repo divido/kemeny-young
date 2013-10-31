@@ -1,5 +1,7 @@
 #include "CondorcetFilter.h"
 
+#include "HeadOnHead.h"
+
 #include <deque>
 using std::deque;
 
@@ -17,8 +19,6 @@ struct CondorcetFilter::Internals
 {
 	const Choices *choices;
 	Algorithm *backup;
-
-	int HeadOnHead(ChoiceID candidate, ChoiceID opponent, const deque<Voter> &voters) const;
 };
 
 CondorcetFilter::CondorcetFilter(const Choices &choices, const deque<Voter> &voters, Algorithm &backup)
@@ -56,7 +56,7 @@ deque<set<ChoiceID> > CondorcetFilter::Execute(const set<ChoiceID> &choices, con
 			{
 				if (opponent == candidate) continue;
 
-				int outcome = intern->HeadOnHead(*candidate, *opponent, voters);
+				int outcome = HeadOnHead(*candidate, *opponent, voters);
 				if (outcome >= 0) foundLoser  = false;
 				if (outcome <= 0) foundWinner = false;
 			}
@@ -108,19 +108,4 @@ deque<set<ChoiceID> > CondorcetFilter::Execute(const set<ChoiceID> &choices, con
 	}
 
 	return results;
-}
-
-int CondorcetFilter::Internals::HeadOnHead(ChoiceID candidate, ChoiceID opponent, const deque<Voter> &voters) const
-{
-	deque<Voter>::const_iterator voter;
-
-	int result = 0;
-
-	for (voter = voters.begin(); voter != voters.end(); voter++)
-	{
-		if (voter->Prefers(candidate, opponent)) result++;
-		if (voter->Prefers(opponent, candidate)) result--;
-	}
-
-	return result;
 }
