@@ -50,6 +50,9 @@ deque<set<ChoiceID> > PermutingAlgorithm::Run(const Choices &choices, const dequ
 	Permutation permutation;
 
 	set<ChoiceID> allChoices = choices.allChoices();
+	if (allChoices.size() == 0)
+		return deque<set<ChoiceID> >();
+
 	set<ChoiceID>::const_iterator choice;
 	for (choice = allChoices.begin(); choice != allChoices.end(); choice++)
 		permutation.push_back(*choice);
