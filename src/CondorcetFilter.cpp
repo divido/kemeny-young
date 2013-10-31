@@ -98,9 +98,9 @@ deque<set<ChoiceID> > CondorcetFilter::Run(const Choices &choices, const deque<V
 	for (backupResult = backupResults.begin(); backupResult != backupResults.end(); backupResult++)
 		results.push_back(*backupResult);
 
-	// Add the Condorcet Losers
-	deque<ChoiceID>::iterator loser;
-	for (loser = losers.begin(); loser != losers.end(); loser++)
+	// Add the Condorcet Losers (in reverse order, since they are currently in order of "biggest loser")
+	deque<ChoiceID>::reverse_iterator loser;
+	for (loser = losers.rbegin(); loser != losers.rend(); loser++)
 	{
 		set<ChoiceID> singleEntrySet;
 		singleEntrySet.insert(*loser);
