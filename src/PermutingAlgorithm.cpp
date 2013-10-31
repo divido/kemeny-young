@@ -20,6 +20,9 @@ using std::setw;
 #include <algorithm>
 using std::next_permutation;
 
+#include <stdexcept>
+using std::logic_error;
+
 // --------------------------------------------------------------------------------
 
 typedef deque<ChoiceID> Permutation;
@@ -129,26 +132,116 @@ void PermutingAlgorithm::Internals::Print(const Choices &choices, const Permutat
 	cout << stream.str() << endl;
 }
 
+inline int CompareInPermutations(ChoiceID first, ChoiceID second, const deque<Permutation> &results)
+{
+	int expectation = 0;
+
+	deque<Permutation>::const_iterator result;
+	for (result = results.begin(); result != results.end(); result++)
+	{
+		int comparison = 0;
+		deque<ChoiceID>::const_iterator iter;
+
+		for (iter = result->begin(); iter != result->end(); iter++)
+		{
+			if (*iter == first)  { comparison = -1; break; }
+			if (*iter == second) { comparison =  1; break; }
+		}
+
+		if (comparison == 0)
+			throw logic_error("Choices aren't present in result set?!");
+
+		// First time through. Set up expectation
+		if (expectation == 0) expectation = comparison;
+
+		// Otherwise, if we don't match the expectation, then the choices arrive
+		// in different orders in different permutations. Consider them "equal"
+		else if (comparison != expectation) return 0;
+	}
+
+	if (expectation == 0)
+		throw logic_error("Result set seems to be empty, can't compare");
+
+	return expectation;
+}
+
+int CompareInPermutations(ChoiceID first, const set<ChoiceID> &seconds, const deque<Permutation> &results)
+{
+	bool firstCompare = true;
+	int comparison;
+
+	set<ChoiceID>::const_iterator second;
+	for (second = seconds.begin(); second != seconds.end(); second++)
+	{
+		int thisComparison = CompareInPermutations(first, *second, results);
+		if (firstCompare) comparison = thisComparison;
+		else if (comparison != thisComparison) return 0;
+		firstCompare = false;
+	}
+
+	if (firstCompare) throw logic_error("Empty seconds set, Can't compare");
+	return comparison;
+}
+
+int CompareInPermutations(const set<ChoiceID> &firsts, const set<ChoiceID> &seconds, const deque<Permutation> &results)
+{
+	bool firstCompare = true;
+	int comparison;
+
+	set<ChoiceID>::const_iterator first;
+	for (first = firsts.begin(); first != firsts.end(); first++)
+	{
+		int thisComparison = CompareInPermutations(*first, seconds, results);
+		if (firstCompare) comparison = thisComparison;
+		else if (comparison != thisComparison) return 0;
+		firstCompare = false;
+	}
+
+	if (firstCompare) throw logic_error("Empty firsts set, Can't compare");
+	return comparison;
+}
+
 deque<set<ChoiceID> > PermutingAlgorithm::Internals::Merge(const deque<Permutation> &results)
 {
 	deque<set<ChoiceID> > merged;
+	if (results.size() == 0) return merged;
 
-	unsigned length = results[0].size();
-	unsigned index = 0;
-	while (index < length)
+	// Populate the sets with a default single entry set
+	Permutation::const_iterator choice;
+	for (choice = results[0].begin(); choice != results[0].end(); choice++)
 	{
-		set<ChoiceID> tiedResults;
-
-		deque<Permutation>::const_iterator result;
-		for (result = results.begin(); result != results.end(); result++)
-		{
-			const Permutation &permutation = *result;
-			tiedResults.insert(permutation[index]);
-		}
-
-		merged.push_back(tiedResults);
-		index += tiedResults.size();
+		set<ChoiceID> singleEntrySet;
+		singleEntrySet.insert(*choice);
+		merged.push_back(singleEntrySet);
 	}
+
+	bool changedSomething;
+	do
+	{
+		changedSomething = false;
+
+		for (unsigned i = 0; i < merged.size() - 1; i++)
+		{
+			set<ChoiceID> &first = merged[i];
+			set<ChoiceID> &second = merged[i + 1];
+
+			int comparison = CompareInPermutations(first, second, results);
+
+			if (comparison > 0)
+			{
+				// Order is reversed
+				first.swap(second);
+				changedSomething = true;
+			}
+			else if (comparison == 0)
+			{
+				// Equal, therefore we must merge them
+				first.insert(second.begin(), second.end());
+				merged.erase(merged.begin() + i + 1);
+				changedSomething = true;
+			}
+		}
+	} while (changedSomething);
 
 	return merged;
 }
