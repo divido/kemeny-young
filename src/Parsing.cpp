@@ -17,6 +17,11 @@ void Process(istream &stream, Choices &choices, deque<Voter> &voters)
 
 	while (getline(stream, line))
 	{
+		// Preprocess comments
+		size_t comment = line.find("#");
+		if (comment != string::npos)
+			line = line.substr(0, comment);
+
 		size_t colon = line.find(":");
 		if (colon == string::npos) continue;
 
