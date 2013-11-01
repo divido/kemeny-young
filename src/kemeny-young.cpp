@@ -5,6 +5,7 @@
 #include "PermutingAlgorithm.h"
 #include "CondorcetFilter.h"
 #include "TieGroupFilter.h"
+#include "CandidateReductionFilter.h"
 
 #include <fstream>
 using std::fstream;
@@ -52,9 +53,9 @@ int main(int argc, char **argv)
 
 	PermutingAlgorithm permuting;
 	CondorcetFilter condorcet(permuting);
-	TieGroupFilter tieGroup(condorcet);
+	CandidateReductionFilter reduction(10, condorcet);
 
-	Algorithm &algorithm = tieGroup;
+	Algorithm &algorithm = reduction;
 	deque<set<ChoiceID> > winner = algorithm.Run(choices, voters);
 
 	// ----------------------------------------
