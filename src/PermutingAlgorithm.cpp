@@ -116,6 +116,23 @@ deque<set<ChoiceID> > PermutingAlgorithm::Run(const Choices &choices, const dequ
 	}
 	cout << endl << endl;
 
+	// Print out the results
+	deque<Permutation>::const_iterator result;
+	for (result = results.begin(); result != results.end(); result++)
+	{
+		cout << highestScore << " ";
+
+		bool first = true;
+		Permutation::const_iterator permutation;
+		for (permutation = result->begin(); permutation != result->end(); permutation++)
+		{
+			cout << (first ? "" : ", ") << "'" << choices.LookupName(*permutation) << "'";
+			first = false;
+		}
+
+		cout << endl;
+	}
+
 	return intern->Merge(results);
 }
 
