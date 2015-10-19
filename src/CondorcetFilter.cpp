@@ -64,16 +64,16 @@ deque<set<ChoiceID> > CondorcetFilter::Run(const Choices &choices, const deque<V
 			{
 				cout << choices.LookupName(*candidate) << " is a condorcet winner" << endl;
 				winners.push_back(*candidate);
-				contenders.erase(candidate);
 				remainingChoices.RemoveChoice(*candidate);
+				contenders.erase(candidate);
 				break;
 			}
 			else if (foundLoser)
 			{
 				cout << choices.LookupName(*candidate) << " is a condorcet loser" << endl;
 				losers.push_back(*candidate);
-				contenders.erase(candidate);
 				remainingChoices.RemoveChoice(*candidate);
+				contenders.erase(candidate);
 				break;
 			}
 		}
